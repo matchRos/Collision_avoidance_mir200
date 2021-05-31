@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+<launch>
+
+<!-- Setup robot1 mobile robot-->
+<include file="$(find multiple_mir)/launch/robots.launch">
+  <arg name="robot_name" value="robot1"/>
+  <arg name="robot_x"   value="-5.0" />  
+  <arg name="robot_y"   value="-7.75" />
+  <arg name="robot_yaw" value="0" />
+  <arg name="displ" value="screen"/> 
+</include>
+
+<!-- Setup robot2 mobile robot-->
+<include file="$(find multiple_mir)/launch/robots.launch">
+  <arg name="robot_name" value="robot2"/>
+  <arg name="robot_x"   value="-5.0" />
+  <arg name="robot_y"   value="-9.0" />
+  <arg name="robot_yaw" value="0" />
+  <arg name="displ" value="screen"/>  
+</include>
+
+<!-- Setup robot3 mobile robot-->
+<include file="$(find multiple_mir)/launch/robots.launch">
+  <arg name="robot_name" value="robot3"/>
+  <arg name="robot_x"   value="-3.5" />
+  <arg name="robot_y"   value="-8.25" />
+  <arg name="robot_yaw" value="0" />
+  <arg name="displ" value="screen"/>  
+</include>
+
+</launch>
+

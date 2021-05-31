@@ -1,0 +1,77 @@
+<launch>
+
+  <param name="use_sim_time" value="true"/>
+
+  <arg name="gui" default="true" />
+  <arg name="world_name" default="$(find mir_gazebo)/maps/world/pp_test_5.world"/> <!--pp_test_5.world, match_7.world -->
+  <!--<arg name="world_name" default="$(find match_gazebo)/worlds/match.world"/>-->
+
+  <node name="unpause_physics" pkg="rosservice" type="rosservice" args="call --wait /gazebo/unpause_physics">
+  </node>
+
+  <group>
+
+    <remap from="robot1/joint_states"                   to="/robot1/mir/joint_states" />
+    <remap from="robot1/mobile_base_controller/cmd_vel" to="/robot1/cmd_vel" />
+    <!--<remap from="robot1/mobile_base_controller/odom"    to="robot1/odom_comb" />-->
+
+    <remap from="robot2/joint_states"                   to="/robot2/mir/joint_states" />
+    <remap from="robot2/mobile_base_controller/cmd_vel" to="/robot2/cmd_vel" />
+
+    <remap from="robot3/joint_states"                   to="/robot3/mir/joint_states" />
+    <remap from="robot3/mobile_base_controller/cmd_vel" to="/robot3/cmd_vel" />
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(arg world_name)"/>
+      <arg name="paused" value="false" />
+      <arg name="gui" value="$(arg gui)" />
+    </include>
+  </group>
+
+
+  <include file="$(find multiple_mir)/launch/robot_1->n.launch"> </include>
+
+  <node name="static_map_server" pkg="map_server" type="map_server" args="$(find mir_gazebo)/maps/pp_test_5.yaml" output="screen">
+    <param name="frame_id" type="string" value="map"/>
+  </node>
+
+  <!--navigation for robot1-->
+  <group ns="robot1">
+  <!--<include file="$(find mir_navigation)/launch/mir_nav/move_base.xml">-->
+  <include file="$(find multiple_mir)/launch/move_base_v1.xml">
+    <arg name="prefix" value="robot1/"/>
+    <arg name="local_planner" value="dwa"/>
+  </include>
+  <!--include file="$(find mir_navigation)/launch/mir_nav/amcl.launch">-->
+  <include file="$(find multiple_mir)/launch/amcl_v1.launch">
+  </include>
+  </group>
+
+  <!--navigation for robot2-->
+  <group ns="robot2">
+  <!--<include file="$(find mir_navigation)/launch/mir_nav/move_base.xml">-->
+  <include file="$(find multiple_mir)/launch/move_base_v2.xml">
+    <arg name="prefix" value="robot2/"/>
+    <arg name="local_planner" value="dwa"/>
+  </include>
+  <!--include file="$(find mir_navigation)/launch/mir_nav/amcl.launch">-->
+  <include file="$(find multiple_mir)/launch/amcl_v2.launch">  
+  </include>
+  </group>
+
+  <!--navigation for robot3-->
+  <group ns="robot3">
+  <!--include file="$(find mir_navigation)/launch/mir_nav/move_base.xml">-->
+  <include file="$(find multiple_mir)/launch/move_base_v3.xml">
+    <arg name="prefix" value="robot3/"/>
+    <arg name="local_planner" value="dwa"/>
+  </include>
+  <!--include file="$(find mir_navigation)/launch/mir_nav/amcl.launch">-->
+  <include file="$(find multiple_mir)/launch/amcl_v3.launch">  
+  </include>
+  </group>
+
+  <!--rviz-->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find multiple_mir)/rviz/system.rviz" /> <!--2D Navigation -->
+
+</launch>

@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<launch>
+    
+    <arg name="robot_x"   default="0.0" />
+    <arg name="robot_y"   default="0.0" />
+    <arg name="robot_yaw" default="0.0" />
+    <arg name="robot_name" default="my_robot" />
+    <arg name="prefix"    value="$(arg robot_name)/" />    <!--this has to be "value", not "default", otherwise subst_value doesn't work-->
+    <arg name="tf_prefix" value="$(arg robot_name)/"/>
+
+    <!-- Load the robot describing urdf xacro with a given tf_prefix for getting propert frames-->  
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find mir_description)/urdf/mir.urdf.xacro tf_prefix:=$(arg robot_name) prefix:=$(arg prefix)" />
+
+    <!-- Spawn the robot into Gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" 
+        args="-param robot_description 
+        -urdf 
+        -model $(arg robot_name)
+        -x $(arg robot_x) 
+        -y $(arg robot_y) 
+        -Y $(arg robot_yaw) " />  
+
+    <!-- Load ros_control controller configurations -->
+    <rosparam file="$(find mir_description)/config/joint_state_controller.yaml" command="load" />
+    <rosparam file="$(find mir_description)/config/diffdrive_controller.yaml" command="load" subst_value="true" />
+
+    <!-- Start the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen"
+        args="joint_state_controller mobile_base_controller"/>
+
+    <!-- Add passive + mimic joints to joint_states topic -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="source_list">[mir/joint_states]</rosparam>
+        <param name="rate" value="200.0" />
+    </node>
+
+
+    <!--<arg name="tf_prefix" default="$(arg robot_name)/" />-->
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_node" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find multiple_mir)/config/ekf2.yaml" subst_value="true" />
+    </node>
+
+
+    <!-- Robot state publisher -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />
+
+    <!-- create combined scan topic (like on real MiR) -->
+    <node pkg="topic_tools" type="relay" name="b_scan_relay" args="b_scan scan"/>
+    <node pkg="topic_tools" type="relay" name="f_scan_relay" args="f_scan scan"/>
+
+    <node name="b_rep117_laser_filter" pkg="mir_driver" type="rep117_filter.py" output="screen">
+        <remap from="scan" to="b_scan" />
+        <remap from="scan_filtered" to="b_scan_rep117" />
+    </node>
+
+    <node name="f_rep117_laser_filter" pkg="mir_driver" type="rep117_filter.py" output="screen">
+        <remap from="scan" to="f_scan" />
+        <remap from="scan_filtered" to="f_scan_rep117" />
+    </node>
+</launch>
+
