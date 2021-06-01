@@ -1,0 +1,3 @@
+<launch>
+    <rosparam file="$(find simple_controller)/config/param.yaml" />
+</launch>

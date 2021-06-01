@@ -1,0 +1,14 @@
+<launch>
+  <!-- include run file from the buttom to top. So the first file will be excuted at the first-->
+  <!--<include file="$(find multi_robot_launcher)/launch/exe_demo.launch"> -->
+  
+  <!--<include file="$(find multi_robot_launcher)/launch/exe_navigation.launch"> -->
+  <!--<include file="$(find mir_navigation)/launch/mir_start.launch"> --> 
+  
+  <include file="$(find multiple_mir)/launch/robots_launcher.launch"> <!---->
+  </include>
+
+  <include file="$(find simple_controller)/launch/launch_param/load_param.launch">
+  </include>
+
+</launch>
