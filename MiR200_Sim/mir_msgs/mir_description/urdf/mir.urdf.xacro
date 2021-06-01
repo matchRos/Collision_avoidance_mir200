@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:xacro="http://ros.org/wiki/xacro"
+       name="mir_200" >
+
+  <xacro:arg name="prefix" default=""/>
+
+  <!-- MiR200 base -->
+  
+  <xacro:include filename="$(find mir_description)/urdf/include/mir_200_v1.urdf.xacro" />
+  <xacro:include filename="$(find mir_description)/urdf/include/common.gazebo.xacro" />
+
+  <xacro:mir_200 prefix="$(arg prefix)"/>
+  <xacro:controller_plugin_gazebo robot_namespace=""/>
+
+  <!-- instead of the controller_plugin_gazebo, you can use the diffdrive controller like this:
+    <xacro:diff_controller_plugin_gazebo prefix=""
+      left_wheel_joint="left_wheel_joint"
+      right_wheel_joint="right_wheel_joint"
+      wheel_separation="${2*mir_200_act_wheel_dy}"
+      wheel_radius="${mir_200_act_wheel_radius}"/>
+  -->
+</robot>

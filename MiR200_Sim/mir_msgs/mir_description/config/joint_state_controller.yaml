@@ -1,0 +1,12 @@
+# Publish all joint states -----------------------------------
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+#gazebo_ros_control/pid_gains:
+  #left_wheel_joint: {p: 100.0, i: 0.01, d: 10.0}
+  #right_wheel_joint: {p: 100.0, i: 0.01, d: 10.0}
+
+gazebo_ros_control/pid_gains:
+  left_wheel_joint: {p: 1.0}
+  right_wheel_joint: {p: 1.0}
